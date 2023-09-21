@@ -7,7 +7,7 @@ public class Location
     public required string Filename { get; set; }
 }
 
-public abstract class AstNode 
+public class AstNode 
 {
     public required Location Location { get; set; }
 }
