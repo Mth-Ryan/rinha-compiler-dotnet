@@ -24,7 +24,9 @@ if (helpRequest)
 if (args.Length == 0)
 {
     Console.Error.WriteLine("need at least one source file");
+    Environment.ExitCode = 1;
     return;
 }
 
-Compile.Run(sourcePaths, referencePaths);
+var exitCode = await Compile.Run(sourcePaths, referencePaths);
+Environment.ExitCode = exitCode;

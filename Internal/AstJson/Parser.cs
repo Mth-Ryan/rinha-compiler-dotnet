@@ -3,11 +3,11 @@ using Rinha.Syntax;
 
 namespace Rinha.Internal.AstJson;
 
-public class Parser
+public class JsonParser
 {
     private JsonSerializerOptions Options { get; init; }
 
-    public Parser()
+    public JsonParser()
     {
         Options = new JsonSerializerOptions
         {
