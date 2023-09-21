@@ -1,47 +1,30 @@
-﻿using Rinha.Internal.AstJson;
-using Rinha.Syntax;
+﻿using Mono.Options;
+using Rinha.Commands;
 
-var jsonParser = new Parser();
-var jsonEmmiter = new Emmiter();
+var referencePaths = new List<string>();
+var sourcePaths = new List<string>();
+var helpRequest = false;
 
-var src = @"
+var options = new OptionSet
 {
-  ""name"": ""ata.rinha"",
-  ""expression"": {
-    ""kind"": ""Binary"",
-    ""lhs"": {
-      ""kind"": ""Int"",
-      ""value"": 1,
-      ""location"": {
-        ""start"": 0,
-        ""end"": 1,
-        ""filename"": ""ata.rinha""
-      }
-    },
-    ""op"": ""Add"",
-    ""rhs"": {
-      ""kind"": ""Int"",
-      ""value"": 2,
-      ""location"": {
-        ""start"": 2,
-        ""end"": 3,
-        ""filename"": ""ata.rinha""
-      }
-    },
-    ""location"": {
-      ""start"": 0,
-      ""end"": 3,
-      ""filename"": ""ata.rinha""
-    }
-  },
-  ""location"": {
-    ""start"": 0,
-    ""end"": 1,
-    ""filename"": ""ata.rinha""
-  }
-}
-";
+    "usage: rinhac <source-paths...> [options]",
+    { "r=", "The {path} of an assembly to reference", v => referencePaths.Add(v) },
+    { "h|help", "Prints help", v => helpRequest = true },
+    { "<>", v => sourcePaths.Add(v) },
+};
 
-var parsed = jsonParser.Parse(src);
-var emmited = jsonEmmiter.Emmit(parsed!);
-Console.WriteLine(emmited);
+options.Parse(args);
+
+if (helpRequest)
+{
+    Help.Run(options);
+    return;
+}
+
+if (args.Length == 0)
+{
+    Console.Error.WriteLine("need at least one source file");
+    return;
+}
+
+Compile.Run(sourcePaths, referencePaths);

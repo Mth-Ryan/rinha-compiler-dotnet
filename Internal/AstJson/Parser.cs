@@ -20,5 +20,10 @@ public class Parser
     {
         return JsonSerializer.Deserialize<AstFile>(input, Options);
     }
+
+    public AstFile? Parse(FileStream input)
+    {
+        return JsonSerializer.Deserialize<AstFile>(input, Options);
+    }
 }
 
