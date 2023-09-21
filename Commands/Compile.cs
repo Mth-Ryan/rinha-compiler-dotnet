@@ -22,8 +22,6 @@ public static class Compile
 
     private static async Task<ImmutableArray<Diagnostic>> CompileFiles(List<string> filePaths, List<string> references)
     {
-        var compiler = new Compiler();
-
         var (sources, sourcesDiagnostics) = GetFileNameAndStream(filePaths);
 
         if (sourcesDiagnostics.Length != 0)
@@ -32,7 +30,7 @@ public static class Compile
         var tasks = new List<Task<ImmutableArray<Diagnostic>>>();
         foreach (var source in sources)
         {
-            tasks.Append(compiler.Compile(source.Item1, source.Item2, references));
+            tasks.Append(Compiler.Compile(source.Item1, source.Item2, references));
         }
 
         var diagosticsArr = await Task.WhenAll(tasks);
