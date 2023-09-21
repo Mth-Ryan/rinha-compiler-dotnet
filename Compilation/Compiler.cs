@@ -16,6 +16,7 @@ public static class Compiler
     // FIXME: make the compilation real async
     private static async Task<ImmutableArray<Diagnostic>> CompileJson(string filename, FileStream input, List<string> references)
     {
+        await Task.CompletedTask;
         var (ast, frontDiagnostics) = JsonFrontendPipeline(filename, input);
         if (frontDiagnostics.Length != 0)
         {
