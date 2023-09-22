@@ -41,11 +41,7 @@ public class Emitter
 
     private string CreateEmitDirectory(string filename, string baseDir)
     {
-        var targetsDir = Path.Combine(baseDir, "targets");
-        var targetSpecificDir = Path.Combine(targetsDir, filename);
-
-        if (!Directory.Exists(targetsDir))
-            Directory.CreateDirectory(targetsDir);
+        var targetSpecificDir = Path.Combine(baseDir, filename);
 
         if (!Directory.Exists(targetSpecificDir))
             Directory.CreateDirectory(targetSpecificDir);
