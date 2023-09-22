@@ -478,3 +478,4 @@ $RECYCLE.BIN/
 
 # build targets
 /targets/
+/out/

@@ -1,6 +1,13 @@
 ﻿using Mono.Options;
 using Rinha.Commands;
 
+if (args.Length == 0 || args[0] == "")
+{
+    Console.Error.WriteLine("need at least one source file");
+    Environment.ExitCode = 1;
+    return;
+}
+
 var referencePaths = new List<string>();
 var sourcePaths = new List<string>();
 var helpRequest = false;
@@ -20,13 +27,6 @@ options.Parse(args);
 if (helpRequest)
 {
     Help.Run(options);
-    return;
-}
-
-if (args.Length == 0)
-{
-    Console.Error.WriteLine("need at least one source file");
-    Environment.ExitCode = 1;
     return;
 }
 
