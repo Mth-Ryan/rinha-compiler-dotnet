@@ -13,4 +13,9 @@ public class LetIntExpr : Expression
         yield return Value;
         yield return In;
     }
+
+    public override string ToString()
+    {
+        return $"{Kind.ToString()} {Name}";
+    }
 }

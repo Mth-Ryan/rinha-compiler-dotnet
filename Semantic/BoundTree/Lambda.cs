@@ -11,4 +11,20 @@ public class LambdaExpr : Expression
     {
         yield return Body;
     }
+
+    public override string ToString()
+    {
+        var image = $"{Kind.ToString()}";
+        if (Parameters.Count > 0)
+        {
+            image += " (";
+            for (int i = 0; i < Parameters.Count - 1; i++)
+            {
+                image += $"{Parameters[i]}, ";
+            }
+            image += Parameters[Parameters.Count - 1];
+            image += ")";
+        }
+        return image;
+    }
 }

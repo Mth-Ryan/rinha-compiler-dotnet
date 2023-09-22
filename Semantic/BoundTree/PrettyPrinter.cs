@@ -8,7 +8,7 @@ public static class PrettyPrinter
     private static void PrintNode(Node node, int identSize = 0)
     {
         var ident = String.Concat(Enumerable.Repeat(" ", identSize));
-        Console.WriteLine(ident + node.Kind.ToString());
+        Console.WriteLine(ident + node.ToString());
 
         var children = node.GetChildren();
         if (children is not null)

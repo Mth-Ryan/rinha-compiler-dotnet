@@ -15,4 +15,9 @@ public class BinaryExpr : Expression
         yield return Lhs;
         yield return Rhs;
     }
+
+    public override string ToString()
+    {
+        return $"{Kind.ToString()} {Op.ToString()}";
+    }
 }

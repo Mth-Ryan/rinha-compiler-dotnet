@@ -10,6 +10,10 @@ public class IntegerExpr : Literal
     public required int Value { get; init; }
 
     public override IEnumerable<Node>? GetChildren() => null;
+    public override string ToString()
+    {
+        return $"{Kind.ToString()} {Value}";
+    }
 }
 
 public class StringExpr : Literal
@@ -18,6 +22,10 @@ public class StringExpr : Literal
     public required string Value { get; init; }
 
     public override IEnumerable<Node>? GetChildren() => null;
+    public override string ToString()
+    {
+        return $"{Kind.ToString()} {Value}";
+    }
 }
 
 
@@ -27,4 +35,8 @@ public class BooleanExpr : Literal
     public required bool Value { get; init; }
 
     public override IEnumerable<Node>? GetChildren() => null;
+    public override string ToString()
+    {
+        return $"{Kind.ToString()} {Value}";
+    }
 }
