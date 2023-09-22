@@ -7,9 +7,9 @@ namespace Rinha.Commands;
 
 public static class Compile
 {
-    public static async Task<int> Run(List<string> filePaths, List<string> references)
+    public static async Task<int> Run(string outputPath, List<string> filePaths, List<string> references)
     {
-        var diagnostics = await CompileFiles(filePaths, references);
+        var diagnostics = await CompileFiles(outputPath, filePaths, references);
         
         if (diagnostics.Length != 0)
         {
@@ -20,7 +20,7 @@ public static class Compile
         return 0;
     }
 
-    private static async Task<ImmutableArray<Diagnostic>> CompileFiles(List<string> filePaths, List<string> references)
+    private static async Task<ImmutableArray<Diagnostic>> CompileFiles(string outputPath, List<string> filePaths, List<string> references)
     {
         var (sources, sourcesDiagnostics) = GetFileNameAndStream(filePaths);
 
@@ -30,7 +30,7 @@ public static class Compile
         var tasks = new List<Task<ImmutableArray<Diagnostic>>>();
         foreach (var source in sources)
         {
-            tasks.Append(Compiler.Compile(source.Item1, source.Item2, references));
+            tasks.Append(Compiler.Compile(source.Item1, source.Item2, outputPath, references));
         }
 
         var diagosticsArr = await Task.WhenAll(tasks);
@@ -44,7 +44,7 @@ public static class Compile
 
         foreach (var path in filePaths)
         {
-            var filename = Path.GetFileName(path);
+            var filename = Path.GetFileNameWithoutExtension(path);
 
             try
             {
