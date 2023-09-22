@@ -6,4 +6,11 @@ public class CallExpr : Expression
 
     public required Expression Callee { get; init; }
     public required List<Expression> Arguments { get; init; }
+
+    public override IEnumerable<Node> GetChildren()
+    {
+        yield return Callee;
+        foreach (var arg in Arguments)
+            yield return arg;
+    }
 }

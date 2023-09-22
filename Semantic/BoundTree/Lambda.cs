@@ -6,4 +6,9 @@ public class LambdaExpr : Expression
 
     public required List<string> Parameters { get; init; }
     public required Expression Body { get; init; }
+
+    public override IEnumerable<Node>? GetChildren()
+    {
+        yield return Body;
+    }
 }

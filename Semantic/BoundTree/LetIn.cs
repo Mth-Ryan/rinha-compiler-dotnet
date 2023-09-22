@@ -7,4 +7,10 @@ public class LetIntExpr : Expression
     public required string Name { get; init; }
     public required Expression Value { get; init; }
     public required Expression In { get; init; }
+
+    public override IEnumerable<Node>? GetChildren()
+    {
+        yield return Value;
+        yield return In;
+    }
 }

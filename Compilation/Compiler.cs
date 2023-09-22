@@ -2,6 +2,8 @@ using System.Collections.Immutable;
 using System.Text.Json;
 using Rinha.Diagnostics;
 using Rinha.Internal.AstJson;
+using Rinha.Semantic;
+using Rinha.Semantic.BoundTree;
 using Rinha.Syntax;
 
 namespace Rinha.Compilation;
@@ -58,9 +60,10 @@ public static class Compiler
 
     private static ImmutableArray<Diagnostic> BackendPipeline(AstFile ast, List<string> references)
     {
-        var jsonEmmiter = new JsonEmmiter();
-        Console.WriteLine(jsonEmmiter.Emmit(ast));
+        var binder = new Binder();
+        var (bound, diagnostics) = binder.Bind(ast);
+        PrettyPrinter.Print(bound!);
 
-        return new DiagnosticsBag().ToImmutableArray();
+        return diagnostics;
     }
 }

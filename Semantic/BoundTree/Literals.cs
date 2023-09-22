@@ -8,12 +8,16 @@ public class IntegerExpr : Literal
 {
     public override BoundKind Kind => BoundKind.Integer;
     public required int Value { get; init; }
+
+    public override IEnumerable<Node>? GetChildren() => null;
 }
 
 public class StringExpr : Literal
 {
     public override BoundKind Kind => BoundKind.Boolean;
     public required string Value { get; init; }
+
+    public override IEnumerable<Node>? GetChildren() => null;
 }
 
 
@@ -21,4 +25,6 @@ public class BooleanExpr : Literal
 {
     public override BoundKind Kind => BoundKind.Boolean;
     public required bool Value { get; init; }
+
+    public override IEnumerable<Node>? GetChildren() => null;
 }

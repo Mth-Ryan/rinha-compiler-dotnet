@@ -9,4 +9,10 @@ public class BinaryExpr : Expression
     public required Expression Lhs { get; init; }
     public required BinaryOp Op { get; init; }
     public required Expression Rhs { get; init; }
+
+    public override IEnumerable<Node> GetChildren()
+    {
+        yield return Lhs;
+        yield return Rhs;
+    }
 }
