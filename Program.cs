@@ -30,5 +30,8 @@ if (args.Length == 0)
     return;
 }
 
-var exitCode = await Compile.Run(outputFolderPath, sourcePaths, referencePaths);
+var exitCode = await Compile.Run(
+    outputFolderPath,
+    sourcePaths,
+    referencePaths);
 Environment.ExitCode = exitCode;

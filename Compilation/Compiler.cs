@@ -62,8 +62,8 @@ public static class Compiler
         var binder = new Binder();
         var (bound, diagnostics) = binder.Bind(ast);
 
-        var emmiter = new Emmit.Emmiter();
-        emmiter.EmmitFile(filename, bound!, outputPath);
+        var emmiter = new Emit.Emitter();
+        emmiter.EmitFile(filename, bound!, outputPath);
 
         return diagnostics;
     }

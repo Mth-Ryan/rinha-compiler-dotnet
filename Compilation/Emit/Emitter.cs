@@ -4,11 +4,11 @@ using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Rinha.Semantic.BoundTree;
 
-namespace Rinha.Compilation.Emmit;
+namespace Rinha.Compilation.Emit;
 
-public class Emmiter
+public class Emitter
 {
-    public ImmutableArray<Diagnostic> EmmitFile(string outputName, Node boundTree, string outputDir)
+    public ImmutableArray<Diagnostic> EmitFile(string outputName, Node boundTree, string outputDir)
     {
         var assemblyName = new AssemblyNameDefinition($"{outputName}", new Version(1, 0, 0));
         var assembly = AssemblyDefinition.CreateAssembly(assemblyName, $"{outputName}", ModuleKind.Console);
@@ -31,15 +31,15 @@ public class Emmiter
 
         assembly.EntryPoint = mainMethodRef;
 
-        var targetDir = CreateEmmitDirectory(outputName, outputDir);
+        var targetDir = CreateEmitDirectory(outputName, outputDir);
 
         assembly.Write(Path.Combine(targetDir, $"{outputName}.dll"));
-        EmmitRuntimeConfig(outputName, targetDir);
+        EmitRuntimeConfig(outputName, targetDir);
 
         return new ImmutableArray<Diagnostic>();
     }
 
-    private string CreateEmmitDirectory(string filename, string baseDir)
+    private string CreateEmitDirectory(string filename, string baseDir)
     {
         var targetsDir = Path.Combine(baseDir, "targets");
         var targetSpecificDir = Path.Combine(targetsDir, filename);
@@ -53,7 +53,7 @@ public class Emmiter
         return targetSpecificDir;
     }
 
-    private void EmmitRuntimeConfig(string filename, string targetDir)
+    private void EmitRuntimeConfig(string filename, string targetDir)
     {
         var config = new RuntimeConfig();
         var configName = $"{filename}.runtimeconfig.json";

@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace Rinha.Compilation.Emmit;
+namespace Rinha.Compilation.Emit;
 
 
 
