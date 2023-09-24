@@ -6,35 +6,42 @@ using Rinha.Semantic.BoundTree;
 
 namespace Rinha.Compilation.Emit;
 
-public class Emitter
+public partial class Emitter
 {
-    public ImmutableArray<Diagnostic> EmitFile(string outputName, Node boundTree, string outputDir)
+    private string _moduleName;
+    private AssemblyDefinition _assembly;
+    private ModuleDefinition _module;
+    private Dictionary<Type, TypeReference> _knownTypes;
+
+    public Emitter(string filename)
     {
-        var assemblyName = new AssemblyNameDefinition($"{outputName}", new Version(1, 0, 0));
-        var assembly = AssemblyDefinition.CreateAssembly(assemblyName, $"{outputName}", ModuleKind.Console);
+        _moduleName = filename;
 
-        var module = assembly.MainModule;
+        var assemblyName = new AssemblyNameDefinition(_moduleName, new Version(1, 0, 0));
+        _assembly = AssemblyDefinition
+            .CreateAssembly(assemblyName, _moduleName, ModuleKind.Console);
 
-        var objectRef = module.ImportReference(typeof(Object));
-        var mainClassRef = new TypeDefinition("", "Program", TypeAttributes.Abstract | TypeAttributes.Sealed, objectRef);
-        module.Types.Add(mainClassRef);
+        _module = _assembly.MainModule;
 
-        var voidRef = module.ImportReference(typeof(void));
-        var mainMethodRef = new MethodDefinition("Main", MethodAttributes.Static | MethodAttributes.Private, voidRef);
-        mainClassRef.Methods.Add(mainMethodRef);
+        _knownTypes = GetKnownTypes(_module);
+    }
+
+    public ImmutableArray<Diagnostic> EmitFile(Node boundTree, string outputDir)
+    {
+
+        var mainClassRef = EmitProgramClass();
+        var mainMethodRef = EmitMainMethod(_module, mainClassRef);
 
         var ilProcessor = mainMethodRef.Body.GetILProcessor();
-        var writelineRef = module.ImportReference(typeof(Console).GetMethod("WriteLine", new [] { typeof(string) }));
-        ilProcessor.Emit(OpCodes.Ldstr, "Hello world from Il");
-        ilProcessor.Emit(OpCodes.Call, writelineRef);
+
+        _assembly.EntryPoint = mainMethodRef;
+
+        var targetDir = CreateEmitDirectory(_moduleName, outputDir);
+        EmitExpression(ilProcessor, new PrintExpr { Value = new StringExpr { Value = "Hello from emmiter" } });
         ilProcessor.Emit(OpCodes.Ret);
 
-        assembly.EntryPoint = mainMethodRef;
-
-        var targetDir = CreateEmitDirectory(outputName, outputDir);
-
-        assembly.Write(Path.Combine(targetDir, $"{outputName}.dll"));
-        EmitRuntimeConfig(outputName, targetDir);
+        _assembly.Write(Path.Combine(targetDir, $"{_moduleName}.dll"));
+        EmitRuntimeConfig(_moduleName, targetDir);
 
         return new ImmutableArray<Diagnostic>();
     }
@@ -62,5 +69,17 @@ public class Emitter
         {
             outputFile.Write(config.ToJson()!);
         }
+    }
+
+    private Dictionary<Type, TypeReference> GetKnownTypes(ModuleDefinition module)
+    {
+        var knownTypes = new Dictionary<Type, TypeReference>();
+
+        knownTypes[typeof(object)] = module.ImportReference(typeof(object));
+        knownTypes[typeof(int)] = module.ImportReference(typeof(int));
+        knownTypes[typeof(string)] = module.ImportReference(typeof(string));
+        knownTypes[typeof(Console)] = module.ImportReference(typeof(Console));
+
+        return knownTypes;
     }
 }

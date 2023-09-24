@@ -18,7 +18,7 @@ public class IntegerExpr : Literal
 
 public class StringExpr : Literal
 {
-    public override BoundKind Kind => BoundKind.Boolean;
+    public override BoundKind Kind => BoundKind.String;
     public required string Value { get; init; }
 
     public override IEnumerable<Node>? GetChildren() => null;
