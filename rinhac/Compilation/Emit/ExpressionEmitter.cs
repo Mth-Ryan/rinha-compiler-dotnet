@@ -1,5 +1,6 @@
 using Mono.Cecil.Cil;
 using Rinha.Semantic.BoundTree;
+using Rinha.Syntax;
 
 namespace Rinha.Compilation.Emit;
 
@@ -24,10 +25,33 @@ public partial class Emitter
         il.Emit(OpCodes.Newobj, _knownMethods.GetRef(KnownMethod.RinhaBoolCtor));
     }
 
+    public void EmitBinary(ILProcessor il, BinaryExpr node)
+    {
+        EmitExpression(il, node.Lhs);
+        EmitExpression(il, node.Rhs);
+        var method = node.Op switch
+        {
+            BinaryOp.Add => KnownMethod.RinhaAdd,
+            BinaryOp.Sub => KnownMethod.RinhaSub,
+            BinaryOp.Mul => KnownMethod.RinhaMul,
+            BinaryOp.Div => KnownMethod.RinhaDiv,
+            BinaryOp.Rem => KnownMethod.RinhaRem,
+            BinaryOp.Eq => KnownMethod.RinhaEq,
+            BinaryOp.Neq => KnownMethod.RinhaNeq,
+            BinaryOp.Lt => KnownMethod.RinhaLt,
+            BinaryOp.Gt => KnownMethod.RinhaGt,
+            BinaryOp.Gte => KnownMethod.RinhaGOrEq,
+            BinaryOp.Lte => KnownMethod.RinhaLOrEq,
+            BinaryOp.And => KnownMethod.RinhaAnd,
+            _ => KnownMethod.RinhaOr,
+        };
+        EmitBuiltInCall(il, method);
+    }
+
     public void EmitPrint(ILProcessor il, PrintExpr node)
     {
         EmitExpression(il, node.Value);
-        il.Emit(OpCodes.Call, _knownMethods.GetRef(KnownMethod.RinhaPrint));
+        EmitBuiltInCall(il, KnownMethod.RinhaPrint);
     }
 
     public void EmitExpression(ILProcessor il, Expression node)
@@ -46,9 +70,18 @@ public partial class Emitter
                 EmitBoolean(il, (BooleanExpr)node);
                 break;
 
+            case BoundKind.Binary:
+                EmitBinary(il, (BinaryExpr)node);
+                break;
+
             case BoundKind.Print:
                 EmitPrint(il, (PrintExpr)node);
                 break;
         }
+    }
+
+    private void EmitBuiltInCall(ILProcessor il, KnownMethod method)
+    {
+        il.Emit(OpCodes.Call, _knownMethods.GetRef(method));
     }
 }

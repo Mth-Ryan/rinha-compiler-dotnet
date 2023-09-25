@@ -39,7 +39,19 @@ public partial class Emitter
         _assembly.EntryPoint = mainMethodRef;
 
         var targetDir = CreateEmitDirectory(_moduleName, outputDir);
-        EmitExpression(ilProcessor, new PrintExpr { Value = new IntegerExpr { Value = 1 } });
+
+        EmitExpression(
+            ilProcessor,
+            new PrintExpr
+            { 
+                Value = new BinaryExpr
+                {
+                    Op = Syntax.BinaryOp.Rem,
+                    Lhs = new IntegerExpr { Value = 5 },
+                    Rhs = new IntegerExpr { Value = 2 }
+                }
+            });
+
         ilProcessor.Emit(OpCodes.Pop);
         ilProcessor.Emit(OpCodes.Ret);
 
