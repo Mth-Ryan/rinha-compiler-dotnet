@@ -26,6 +26,15 @@ public static partial class BuiltInMethods
         return obj;
     }
 
+    public static bool GetBoolValue(RinhaObject obj)
+    {
+        if (obj.Kind != RinhaObjKind.Bool)
+        {
+            throw new InvalidOperationException();
+        }
+        return ((RinhaBool)obj).Value;
+    }
+
     public static RinhaObject AddClosureBody(RinhaObject closure, Func<RinhaClosureParams, RinhaObject> body)
     {
         if (closure.Kind != RinhaObjKind.Closure)

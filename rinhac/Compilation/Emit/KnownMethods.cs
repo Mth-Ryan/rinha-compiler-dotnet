@@ -30,6 +30,7 @@ public enum KnownMethod
     RinhaOr,
 
     RinhaPrint,
+    RinhaGetBoolVal,
     RinhaFirst,
     RinhaSecond,
 }
@@ -174,6 +175,12 @@ public class KnownMethods
                     typeof(BuiltInMethods).GetMethod(
                         "Or",
                         new [] { typeof(RinhaObject), typeof(RinhaObject) })
+                )
+            },
+            {
+                KnownMethod.RinhaGetBoolVal,
+                module.ImportReference(
+                    typeof(BuiltInMethods).GetMethod("GetBoolValue", new [] { typeof(RinhaObject) })
                 )
             },
             {

@@ -44,13 +44,11 @@ public partial class Emitter
             ilProcessor,
             new PrintExpr
             {
-                Value = new TupleSecondExpr
+                Value = new IfExpr
                 {
-                    Value = new TupleLiteralExpr
-                    {
-                        First = new IntegerExpr { Value = 1 },
-                        Second = new StringExpr { Value = "hello" }
-                    }
+                    Condition = new BooleanExpr { Value = false },
+                    Then = new IntegerExpr { Value = 1 },
+                    Else = new IntegerExpr { Value = 2 }
                 }
             });
 

@@ -73,6 +73,22 @@ public partial class Emitter
         EmitBuiltInCall(il, KnownMethod.RinhaPrint);
     }
 
+    public void EmitIf(ILProcessor il, IfExpr node)
+    {
+        EmitExpression(il, node.Condition);
+        EmitBuiltInCall(il, KnownMethod.RinhaGetBoolVal);
+
+        var ifLabel = il.Create(OpCodes.Nop);
+        var endLabel = il.Create(OpCodes.Nop);
+
+        il.Emit(OpCodes.Brtrue, ifLabel);
+        EmitExpression(il, node.Else);
+        il.Emit(OpCodes.Br, endLabel);
+        il.Append(ifLabel);
+        EmitExpression(il, node.Then);
+        il.Append(endLabel);
+    }
+
     public void EmitExpression(ILProcessor il, Expression node)
     {
         switch (node.Kind)
@@ -103,6 +119,10 @@ public partial class Emitter
 
             case BoundKind.Binary:
                 EmitBinary(il, (BinaryExpr)node);
+                break;
+
+            case BoundKind.If:
+                EmitIf(il, (IfExpr)node);
                 break;
 
             case BoundKind.Print:
