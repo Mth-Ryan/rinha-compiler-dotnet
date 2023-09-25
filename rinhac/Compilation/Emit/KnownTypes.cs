@@ -9,6 +9,7 @@ public enum KnownType
     RinhaObject,
 
     SystemVoid,
+    SystemConsole,
 
     RinhaInt,
     RinhaBool,
@@ -33,6 +34,7 @@ public class KnownTypes
             { KnownType.RinhaObject, module.ImportReference(typeof(RinhaObject)) },
 
             { KnownType.SystemVoid, module.ImportReference(typeof(void)) },
+            { KnownType.SystemConsole, module.ImportReference(typeof(Console)) },
 
             { KnownType.RinhaInt, module.ImportReference(typeof(RinhaInt)) },
             { KnownType.RinhaBool, module.ImportReference(typeof(RinhaBool)) },

@@ -8,28 +8,26 @@ public partial class Emitter
     public void EmitString(ILProcessor il, StringExpr node)
     {
         il.Emit(OpCodes.Ldstr, node.Value);
+        il.Emit(OpCodes.Newobj, _knownMethods.GetRef(KnownMethod.RinhaStrCtor));
     }
 
     public void EmitInteger(ILProcessor il, IntegerExpr node)
     {
         il.Emit(OpCodes.Ldc_I4, node.Value);
+        il.Emit(OpCodes.Newobj, _knownMethods.GetRef(KnownMethod.RinhaIntCtor));
     }
 
 
     public void EmitBoolean(ILProcessor il, BooleanExpr node)
     {
         il.Emit(OpCodes.Ldc_I4, node.Value ? 1 : 0);
+        il.Emit(OpCodes.Newobj, _knownMethods.GetRef(KnownMethod.RinhaBoolCtor));
     }
 
     public void EmitPrint(ILProcessor il, PrintExpr node)
     {
-
-        var writelineRef = _module
-            .ImportReference(typeof(Console)
-            .GetMethod("WriteLine", new [] { typeof(object) }));
-
         EmitExpression(il, node.Value);
-        il.Emit(OpCodes.Call, writelineRef);
+        il.Emit(OpCodes.Call, _knownMethods.GetRef(KnownMethod.RinhaPrint));
     }
 
     public void EmitExpression(ILProcessor il, Expression node)

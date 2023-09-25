@@ -12,6 +12,7 @@ public partial class Emitter
     private AssemblyDefinition _assembly;
     private ModuleDefinition _module;
     private KnownTypes _knownTypes;
+    private KnownMethods _knownMethods;
 
     public Emitter(string filename)
     {
@@ -24,6 +25,7 @@ public partial class Emitter
         _module = _assembly.MainModule;
 
         _knownTypes = new KnownTypes(_module);
+        _knownMethods = new KnownMethods(_module);
     }
 
     public ImmutableArray<Diagnostic> EmitFile(Node boundTree, string outputDir)
@@ -37,7 +39,8 @@ public partial class Emitter
         _assembly.EntryPoint = mainMethodRef;
 
         var targetDir = CreateEmitDirectory(_moduleName, outputDir);
-        EmitExpression(ilProcessor, new PrintExpr { Value = new StringExpr { Value = "Hello from emmiter" } });
+        EmitExpression(ilProcessor, new PrintExpr { Value = new IntegerExpr { Value = 1 } });
+        ilProcessor.Emit(OpCodes.Pop);
         ilProcessor.Emit(OpCodes.Ret);
 
         _assembly.Write(Path.Combine(targetDir, $"{_moduleName}.dll"));
