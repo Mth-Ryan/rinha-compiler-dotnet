@@ -26,7 +26,7 @@ public static partial class BuiltInMethods
         return obj;
     }
 
-    public static RinhaObject AddClosureBody(RinhaObject closure, Func<List<RinhaObject>, RinhaObject> body)
+    public static RinhaObject AddClosureBody(RinhaObject closure, Func<RinhaClosureParams, RinhaObject> body)
     {
         if (closure.Kind != RinhaObjKind.Closure)
         {
@@ -39,7 +39,7 @@ public static partial class BuiltInMethods
         return cls;
     }
 
-    public static RinhaObject RunClosure(RinhaObject closure, List<RinhaObject> args)
+    public static RinhaObject RunClosure(RinhaObject closure, RinhaClosureParams args)
     {
         if (closure.Kind != RinhaObjKind.Closure)
         {
@@ -53,7 +53,7 @@ public static partial class BuiltInMethods
             throw new Exception("use of function not yet initialized");
         }
 
-        if (args.Count != cls.ParamsCount)
+        if (args.Params.Length != cls.ParamsCount)
         {
             throw new ArgumentException("wrong number of arguments");
         }

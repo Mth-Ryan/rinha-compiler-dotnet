@@ -29,6 +29,11 @@ public class RinhaInt : RinhaObject
     {
         return Value.ToString();
     }
+
+    public override int GetHashCode()
+    {
+        return Value.GetHashCode();
+    }
 }
 
 public class RinhaBool : RinhaObject
@@ -44,6 +49,11 @@ public class RinhaBool : RinhaObject
     public override string ToString()
     {
         return Value.ToString();
+    }
+
+    public override int GetHashCode()
+    {
+        return Value.GetHashCode();
     }
 }
 
@@ -80,12 +90,35 @@ public class RinhaTuple : RinhaObject
     }
 }
 
+public class RinhaClosureParams
+{
+    public RinhaObject[] Params { get; set; }
+
+    public RinhaClosureParams(RinhaObject[] parameters)
+    {
+        Params = parameters;
+    }
+
+    public override int GetHashCode()
+    {
+        unchecked
+        {
+            int hash = 17;
+            foreach (var i in Params)
+            {
+                hash = hash * 31 + i.GetHashCode();
+            }
+
+            return hash;
+        }
+    }
+}
 
 public class RinhaClosure : RinhaObject
 {
     public override RinhaObjKind Kind => RinhaObjKind.Closure;
     
-    public Func<List<RinhaObject>, RinhaObject>? Value { get; set; }
+    public Func<RinhaClosureParams, RinhaObject>? Value { get; set; }
     public int ParamsCount { get; set; }
 
     public RinhaClosure(int paramsCount)
