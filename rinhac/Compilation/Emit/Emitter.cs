@@ -43,12 +43,14 @@ public partial class Emitter
         EmitExpression(
             ilProcessor,
             new PrintExpr
-            { 
-                Value = new BinaryExpr
+            {
+                Value = new TupleSecondExpr
                 {
-                    Op = Syntax.BinaryOp.Rem,
-                    Lhs = new IntegerExpr { Value = 5 },
-                    Rhs = new IntegerExpr { Value = 2 }
+                    Value = new TupleLiteralExpr
+                    {
+                        First = new IntegerExpr { Value = 1 },
+                        Second = new StringExpr { Value = "hello" }
+                    }
                 }
             });
 

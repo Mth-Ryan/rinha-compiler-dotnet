@@ -48,6 +48,25 @@ public partial class Emitter
         EmitBuiltInCall(il, method);
     }
 
+    public void EmitTuple(ILProcessor il, TupleLiteralExpr node)
+    {
+        EmitExpression(il, node.First);
+        EmitExpression(il, node.Second);
+        EmitBuiltInCtor(il, KnownMethod.RinhaTupleCtor);
+    }
+
+    public void EmuitTupleFirst(ILProcessor il, TupleFirstExpr node)
+    {
+        EmitExpression(il, node.Value);
+        EmitBuiltInCall(il, KnownMethod.RinhaFirst);
+    }
+
+    public void EmuitTupleSecond(ILProcessor il, TupleSecondExpr node)
+    {
+        EmitExpression(il, node.Value);
+        EmitBuiltInCall(il, KnownMethod.RinhaSecond);
+    }
+
     public void EmitPrint(ILProcessor il, PrintExpr node)
     {
         EmitExpression(il, node.Value);
@@ -70,6 +89,18 @@ public partial class Emitter
                 EmitBoolean(il, (BooleanExpr)node);
                 break;
 
+            case BoundKind.TupleLiteral:
+                EmitTuple(il, (TupleLiteralExpr)node);
+                break;
+
+            case BoundKind.TupleFirst:
+                EmuitTupleFirst(il, (TupleFirstExpr)node);
+                break;
+
+            case BoundKind.TupleSecond:
+                EmuitTupleSecond(il, (TupleSecondExpr)node);
+                break;
+
             case BoundKind.Binary:
                 EmitBinary(il, (BinaryExpr)node);
                 break;
@@ -77,11 +108,19 @@ public partial class Emitter
             case BoundKind.Print:
                 EmitPrint(il, (PrintExpr)node);
                 break;
+
+            default:
+                throw new Exception($"Invalid bound expression of kind: {node.Kind}");
         }
     }
 
     private void EmitBuiltInCall(ILProcessor il, KnownMethod method)
     {
         il.Emit(OpCodes.Call, _knownMethods.GetRef(method));
+    }
+
+    private void EmitBuiltInCtor(ILProcessor il, KnownMethod method)
+    {
+        il.Emit(OpCodes.Newobj, _knownMethods.GetRef(method));
     }
 }

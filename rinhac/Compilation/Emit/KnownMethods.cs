@@ -10,6 +10,7 @@ public enum KnownMethod
     RinhaIntCtor,
     RinhaBoolCtor,
     RinhaStrCtor,
+    RinhaTupleCtor,
 
     // Arithmetic
     RinhaAdd,
@@ -29,6 +30,8 @@ public enum KnownMethod
     RinhaOr,
 
     RinhaPrint,
+    RinhaFirst,
+    RinhaSecond,
 }
 
 public class KnownMethods
@@ -64,9 +67,9 @@ public class KnownMethods
                 )
             },
             {
-                KnownMethod.RinhaPrint,
+                KnownMethod.RinhaTupleCtor,
                 module.ImportReference(
-                    typeof(BuiltInMethods).GetMethod("Print", new [] { typeof(RinhaObject) })
+                    typeof(RinhaTuple).GetConstructors()[0]
                 )
             },
             {
@@ -171,6 +174,24 @@ public class KnownMethods
                     typeof(BuiltInMethods).GetMethod(
                         "Or",
                         new [] { typeof(RinhaObject), typeof(RinhaObject) })
+                )
+            },
+            {
+                KnownMethod.RinhaPrint,
+                module.ImportReference(
+                    typeof(BuiltInMethods).GetMethod("Print", new [] { typeof(RinhaObject) })
+                )
+            },
+            {
+                KnownMethod.RinhaFirst,
+                module.ImportReference(
+                    typeof(BuiltInMethods).GetMethod("First", new [] { typeof(RinhaObject) })
+                )
+            },
+            {
+                KnownMethod.RinhaSecond,
+                module.ImportReference(
+                    typeof(BuiltInMethods).GetMethod("Second", new [] { typeof(RinhaObject) })
                 )
             },
         };
