@@ -18,11 +18,10 @@ public partial class Emitter
 
     private MethodDefinition EmitMainMethod(ModuleDefinition module, TypeDefinition mainClass)
     {
-        var voidRef = module.ImportReference(typeof(void));
         return EmitMethod(
             mainClass,
             "Main",
             MethodAttributes.Static | MethodAttributes.Private,
-            voidRef);
+            _knownTypes.GetRef(KnownType.SystemVoid));
     }
 }

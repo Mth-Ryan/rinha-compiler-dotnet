@@ -11,7 +11,7 @@ public partial class Emitter
     private string _moduleName;
     private AssemblyDefinition _assembly;
     private ModuleDefinition _module;
-    private Dictionary<Type, TypeReference> _knownTypes;
+    private KnownTypes _knownTypes;
 
     public Emitter(string filename)
     {
@@ -23,7 +23,7 @@ public partial class Emitter
 
         _module = _assembly.MainModule;
 
-        _knownTypes = GetKnownTypes(_module);
+        _knownTypes = new KnownTypes(_module);
     }
 
     public ImmutableArray<Diagnostic> EmitFile(Node boundTree, string outputDir)
@@ -69,17 +69,5 @@ public partial class Emitter
         {
             outputFile.Write(config.ToJson()!);
         }
-    }
-
-    private Dictionary<Type, TypeReference> GetKnownTypes(ModuleDefinition module)
-    {
-        var knownTypes = new Dictionary<Type, TypeReference>();
-
-        knownTypes[typeof(object)] = module.ImportReference(typeof(object));
-        knownTypes[typeof(int)] = module.ImportReference(typeof(int));
-        knownTypes[typeof(string)] = module.ImportReference(typeof(string));
-        knownTypes[typeof(Console)] = module.ImportReference(typeof(Console));
-
-        return knownTypes;
     }
 }

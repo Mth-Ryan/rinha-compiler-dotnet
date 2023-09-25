@@ -21,6 +21,6 @@ public partial class Emitter
         return EmitClass(
             "Program",
             TypeAttributes.Abstract | TypeAttributes.Sealed,
-            _knownTypes[typeof(object)]);
+            _knownTypes.GetRef(KnownType.SystemObject));
     }
 }
