@@ -48,7 +48,7 @@ public partial class Emitter
                 {
                     Condition = new BooleanExpr { Value = false },
                     Then = new IntegerExpr { Value = 1 },
-                    Else = new IntegerExpr { Value = 2 }
+                    Else = new IntegerExpr { Value = 3 }
                 }
             });
 
