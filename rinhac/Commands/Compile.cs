@@ -7,9 +7,9 @@ namespace Rinha.Commands;
 
 public static class Compile
 {
-    public static async Task<int> Run(string outputPath, List<string> filePaths, List<string> references)
+    public static int Run(string outputPath, List<string> filePaths, List<string> references)
     {
-        var diagnostics = await CompileFiles(outputPath, filePaths, references);
+        var diagnostics = CompileFiles(outputPath, filePaths, references);
         
         if (diagnostics.Length != 0)
         {
@@ -20,21 +20,27 @@ public static class Compile
         return 0;
     }
 
-    private static async Task<ImmutableArray<Diagnostic>> CompileFiles(string outputPath, List<string> filePaths, List<string> references)
+    private static ImmutableArray<Diagnostic> CompileFiles(
+        string outputPath,
+        List<string> filePaths,
+        List<string> references)
     {
         var (sources, sourcesDiagnostics) = GetFileNameAndStream(filePaths);
 
         if (sourcesDiagnostics.Length != 0)
             return sourcesDiagnostics;
 
-        var tasks = new List<Task<ImmutableArray<Diagnostic>>>();
+        var diagnostics = new List<ImmutableArray<Diagnostic>>();
         foreach (var source in sources)
         {
-            tasks.Append(Compiler.Compile(source.Item1, source.Item2, outputPath, references));
+            diagnostics.Add(Compiler.Compile(
+                source.Item1,
+                source.Item2,
+                outputPath,
+                references));
         }
 
-        var diagosticsArr = await Task.WhenAll(tasks);
-        return diagosticsArr.SelectMany(x => x).ToImmutableArray();
+        return diagnostics.SelectMany(x => x).ToImmutableArray();
     }
 
     private static (List<(string, FileStream)>, ImmutableArray<Diagnostic>) GetFileNameAndStream(List<string> filePaths)

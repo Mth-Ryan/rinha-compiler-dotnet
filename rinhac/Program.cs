@@ -30,7 +30,7 @@ if (helpRequest)
     return;
 }
 
-var exitCode = await Compile.Run(
+var exitCode = Compile.Run(
     outputFolderPath,
     sourcePaths,
     referencePaths);

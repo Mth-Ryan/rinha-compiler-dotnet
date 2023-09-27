@@ -10,15 +10,21 @@ namespace Rinha.Compilation;
 
 public static class Compiler
 {
-    public static async Task<ImmutableArray<Diagnostic>> Compile(string filename, FileStream input, string outputPath, List<string> references)
+    public static ImmutableArray<Diagnostic> Compile(
+        string filename,
+        FileStream input,
+        string outputPath,
+        List<string> references)
     {
-        return await CompileJson(filename, input, outputPath, references);
+        return CompileJson(filename, input, outputPath, references);
     }
 
-    // FIXME: make the compilation real async
-    private static async Task<ImmutableArray<Diagnostic>> CompileJson(string filename, FileStream input, string outputPath, List<string> references)
+    private static ImmutableArray<Diagnostic> CompileJson(
+        string filename,
+        FileStream input,
+        string outputPath,
+        List<string> references)
     {
-        await Task.CompletedTask;
         var (ast, frontDiagnostics) = JsonFrontendPipeline(filename, input);
         if (frontDiagnostics.Length != 0)
         {
@@ -29,7 +35,9 @@ public static class Compiler
         return backDiagnostics;
     }
 
-    private static (AstFile?, ImmutableArray<Diagnostic>) JsonFrontendPipeline(string filename, FileStream input)
+    private static (AstFile?, ImmutableArray<Diagnostic>) JsonFrontendPipeline(
+        string filename,
+        FileStream input)
     {
         var diagnostics = new DiagnosticsBag();
         var jsonParser = new JsonParser();
@@ -58,7 +66,11 @@ public static class Compiler
         return (null, diagnostics.ToImmutableArray());
     }
 
-    private static ImmutableArray<Diagnostic> BackendPipeline(string filename, AstFile ast, string outputPath, List<string> references)
+    private static ImmutableArray<Diagnostic> BackendPipeline(
+        string filename,
+        AstFile ast,
+        string outputPath,
+        List<string> references)
     {
         var binder = new Binder();
         var (bound, diagnostics) = binder.Bind(ast);
