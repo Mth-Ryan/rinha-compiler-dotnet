@@ -35,6 +35,7 @@ public enum KnownMethod
     RinhaGetBoolVal,
     RinhaFirst,
     RinhaSecond,
+    RinhaRunClosure,
 }
 
 public class KnownMethods
@@ -213,6 +214,14 @@ public class KnownMethods
                 KnownMethod.RinhaSecond,
                 module.ImportReference(
                     typeof(BuiltInMethods).GetMethod("Second", new [] { typeof(RinhaObject) })
+                )
+            },
+            {
+                KnownMethod.RinhaRunClosure,
+                module.ImportReference(
+                    typeof(BuiltInMethods).GetMethod(
+                        "RunClosure",
+                        new [] { typeof(RinhaObject), typeof(RinhaObject[]) })
                 )
             },
         };

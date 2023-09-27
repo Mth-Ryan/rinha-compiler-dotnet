@@ -129,6 +129,30 @@ public partial class Emitter
         EmitBuiltInCtor(il, KnownMethod.RinhaClosureCtor);
     }
 
+    public void EmitCall(
+        ILProcessor il,
+        LocalVars? locals,
+        Params? args,
+        CallExpr node)
+    {
+        // callee
+        EmitExpression(il, locals, args, node.Callee);
+
+        // args
+        var argsCount = node.Arguments.Count;
+        il.Emit(OpCodes.Ldc_I4, argsCount);
+        il.Emit(OpCodes.Newarr, _knownTypes.GetRef(KnownType.RinhaObject));
+        for (var i = 0; i < argsCount; i++)
+        {
+            il.Emit(OpCodes.Dup);
+            il.Emit(OpCodes.Ldc_I4, i);
+            EmitExpression(il, locals, args, node.Arguments[i]);
+            il.Emit(OpCodes.Stelem_Ref);
+        }
+
+        EmitBuiltInCall(il, KnownMethod.RinhaRunClosure);
+    }
+
     public void EmitLetIn(
         ILProcessor il,
         LocalVars? locals,
@@ -207,6 +231,10 @@ public partial class Emitter
                 EmitLambda(il, locals, args, (LambdaExpr)node);
                 break;
 
+            case BoundKind.Call:
+                EmitCall(il, locals, args, (CallExpr)node);
+                break;
+
             default:
                 throw new Exception($"Invalid bound expression of kind: {node.Kind}");
         }
@@ -228,8 +256,8 @@ public partial class Emitter
         LocalVars? locals,
         Params? args)
     {
-        var variable = locals![symbol!];
-        if (variable is not null)
+        VariableDefinition? variable;
+        if (locals!.TryGetValue(symbol!, out variable))
         {
             il.Emit(OpCodes.Ldloc, variable);
         }

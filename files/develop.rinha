@@ -1,4 +1,4 @@
-let x = fn (n) => {
-    1
+let fib = fn (n) => {
+    n
 };
-print(x)
+print(fib(2))
