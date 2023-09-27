@@ -1,10 +1,11 @@
 namespace Rinha.Semantic.BoundTree;
 
-public class LetIntExpr : Expression
+public class LetInExpr : Expression
 {
     public override BoundKind Kind => BoundKind.LetIn;
 
     public required BoundScope? Scope { get; set; }
+    public required VariableSymbol NewVariable { get; set; }
     public required string Name { get; init; }
     public required Expression Value { get; init; }
     public required Expression In { get; init; }

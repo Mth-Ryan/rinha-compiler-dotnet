@@ -50,16 +50,18 @@ public class Binder
                 .Select(x => BindExpr(x, scope)).ToList()
         };
 
-    private LetIntExpr BindLetInt(LetTerm node, BoundScope? scope)
+    private LetInExpr BindLetIn(LetTerm node, BoundScope? scope)
     {
         var newScope = new BoundScope(scope, ScopeKind.Block);
-        newScope.TryDeclare(new VariableSymbol(
+        var newVar = new VariableSymbol(
             node.Name.Text,
-            VariableSymbolKind.Variable));
+            VariableSymbolKind.Variable);
+        newScope.TryDeclare(newVar);
 
-        return new LetIntExpr
+        return new LetInExpr
         {
             Scope = newScope,
+            NewVariable = newVar,
             Name = node.Name.Text,
             Value = BindExpr(node.Value, newScope),
             In = BindExpr(node.Next, newScope)
@@ -158,7 +160,7 @@ public class Binder
             CallTerm n => BindCall(n, scope),
             BinaryTerm n => BindBinary(n, scope),
             IfTerm n => BindIf(n, scope),
-            LetTerm n => BindLetInt(n, scope),
+            LetTerm n => BindLetIn(n, scope),
             // temporary
             _ => new InvalidExpr {}
         };

@@ -25,10 +25,13 @@ public partial class Emitter
         il.Emit(OpCodes.Newobj, _knownMethods.GetRef(KnownMethod.RinhaBoolCtor));
     }
 
-    public void EmitBinary(ILProcessor il, BinaryExpr node)
+    public void EmitBinary(
+        ILProcessor il,
+        Dictionary<VariableSymbol, VariableDefinition>? locals,
+        BinaryExpr node)
     {
-        EmitExpression(il, node.Lhs);
-        EmitExpression(il, node.Rhs);
+        EmitExpression(il, locals, node.Lhs);
+        EmitExpression(il, locals, node.Rhs);
         var method = node.Op switch
         {
             BinaryOp.Add => KnownMethod.RinhaAdd,
@@ -48,48 +51,87 @@ public partial class Emitter
         EmitBuiltInCall(il, method);
     }
 
-    public void EmitTuple(ILProcessor il, TupleLiteralExpr node)
+    public void EmitTuple(
+        ILProcessor il,
+        Dictionary<VariableSymbol, VariableDefinition>? locals,
+        TupleLiteralExpr node)
     {
-        EmitExpression(il, node.First);
-        EmitExpression(il, node.Second);
+        EmitExpression(il, locals, node.First);
+        EmitExpression(il, locals, node.Second);
         EmitBuiltInCtor(il, KnownMethod.RinhaTupleCtor);
     }
 
-    public void EmuitTupleFirst(ILProcessor il, TupleFirstExpr node)
+    public void EmuitTupleFirst(
+        ILProcessor il,
+        Dictionary<VariableSymbol, VariableDefinition>? locals,
+        TupleFirstExpr node)
     {
-        EmitExpression(il, node.Value);
+        EmitExpression(il, locals, node.Value);
         EmitBuiltInCall(il, KnownMethod.RinhaFirst);
     }
 
-    public void EmuitTupleSecond(ILProcessor il, TupleSecondExpr node)
+    public void EmuitTupleSecond(
+        ILProcessor il,
+        Dictionary<VariableSymbol, VariableDefinition>? locals,
+        TupleSecondExpr node)
     {
-        EmitExpression(il, node.Value);
+        EmitExpression(il, locals, node.Value);
         EmitBuiltInCall(il, KnownMethod.RinhaSecond);
     }
 
-    public void EmitPrint(ILProcessor il, PrintExpr node)
+    public void EmitPrint(
+        ILProcessor il,
+        Dictionary<VariableSymbol, VariableDefinition>? locals,
+        PrintExpr node)
     {
-        EmitExpression(il, node.Value);
+        EmitExpression(il, locals, node.Value);
         EmitBuiltInCall(il, KnownMethod.RinhaPrint);
     }
 
-    public void EmitIf(ILProcessor il, IfExpr node)
+    public void EmitIf(
+        ILProcessor il,
+        Dictionary<VariableSymbol, VariableDefinition>? locals,
+        IfExpr node)
     {
-        EmitExpression(il, node.Condition);
+        EmitExpression(il, locals, node.Condition);
         EmitBuiltInCall(il, KnownMethod.RinhaGetBoolVal);
 
         var ifLabel = il.Create(OpCodes.Nop);
         var endLabel = il.Create(OpCodes.Nop);
 
         il.Emit(OpCodes.Brtrue, ifLabel);
-        EmitExpression(il, node.Else);
+        EmitExpression(il, locals, node.Else);
         il.Emit(OpCodes.Br, endLabel);
         il.Append(ifLabel);
-        EmitExpression(il, node.Then);
+        EmitExpression(il, locals, node.Then);
         il.Append(endLabel);
     }
 
-    public void EmitExpression(ILProcessor il, Expression node)
+    public void EmitLetIn(
+        ILProcessor il,
+        Dictionary<VariableSymbol, VariableDefinition>? locals,
+        LetInExpr node)
+    {
+        EmitExpression(il, locals, node.Value);
+        var variable = locals![node.NewVariable];
+        il.Emit(OpCodes.Stloc, variable);
+        EmitExpression(il, locals, node.In);
+    }
+
+
+    public void EmitVar(
+        ILProcessor il,
+        Dictionary<VariableSymbol, VariableDefinition>? locals,
+        VarExpr node)
+    {
+        var variable = locals![node.Symbol!];
+        il.Emit(OpCodes.Ldloc, variable);
+    }
+
+    public void EmitExpression(
+        ILProcessor il,
+        Dictionary<VariableSymbol, VariableDefinition>? locals,
+        Expression node)
     {
         switch (node.Kind)
         {
@@ -106,27 +148,35 @@ public partial class Emitter
                 break;
 
             case BoundKind.TupleLiteral:
-                EmitTuple(il, (TupleLiteralExpr)node);
+                EmitTuple(il, locals, (TupleLiteralExpr)node);
                 break;
 
             case BoundKind.TupleFirst:
-                EmuitTupleFirst(il, (TupleFirstExpr)node);
+                EmuitTupleFirst(il, locals, (TupleFirstExpr)node);
                 break;
 
             case BoundKind.TupleSecond:
-                EmuitTupleSecond(il, (TupleSecondExpr)node);
+                EmuitTupleSecond(il, locals, (TupleSecondExpr)node);
                 break;
 
             case BoundKind.Binary:
-                EmitBinary(il, (BinaryExpr)node);
+                EmitBinary(il, locals, (BinaryExpr)node);
                 break;
 
             case BoundKind.If:
-                EmitIf(il, (IfExpr)node);
+                EmitIf(il, locals, (IfExpr)node);
                 break;
 
             case BoundKind.Print:
-                EmitPrint(il, (PrintExpr)node);
+                EmitPrint(il, locals, (PrintExpr)node);
+                break;
+
+            case BoundKind.LetIn:
+                EmitLetIn(il, locals, (LetInExpr)node);
+                break;
+
+            case BoundKind.Var:
+                EmitVar(il, locals, (VarExpr)node);
                 break;
 
             default:
