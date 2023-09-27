@@ -1,3 +1,4 @@
-fn (n) => {
+let x = fn (n) => {
     1
-}
+};
+print(x)

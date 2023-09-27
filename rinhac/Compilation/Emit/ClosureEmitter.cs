@@ -78,7 +78,7 @@ public partial class Emitter
         }
 
         var il = method.Body.GetILProcessor();
-        EmitExpression(il, locals, boundExpression);
+        EmitExpression(il, locals, args, boundExpression);
 
         il.Emit(OpCodes.Ret);
     }

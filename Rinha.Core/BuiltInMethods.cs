@@ -35,7 +35,7 @@ public static partial class BuiltInMethods
         return ((RinhaBool)obj).Value;
     }
 
-    public static RinhaObject RunClosure(RinhaObject closure, RinhaClosureParams args)
+    public static RinhaObject RunClosure(RinhaObject closure, RinhaObject[] args)
     {
         if (closure.Kind != RinhaObjKind.Closure)
         {
@@ -44,11 +44,11 @@ public static partial class BuiltInMethods
 
         var cls = (RinhaClosure)closure;
 
-        if (args.Params.Length != cls.ParamsCount)
+        if (args.Length != cls.ParamsCount)
         {
             throw new ArgumentException("wrong number of arguments");
         }
 
-        return cls.Inner.Run(args.Params);
+        return cls.Inner.Run(args);
     }
 }
