@@ -114,15 +114,25 @@ public class RinhaClosureParams
     }
 }
 
+public abstract class RinhaRunnableClosure
+{
+    public abstract RinhaObject Run(RinhaObject[] args);
+
+    public RinhaRunnableClosure() 
+    {
+    }
+}
+
 public class RinhaClosure : RinhaObject
 {
     public override RinhaObjKind Kind => RinhaObjKind.Closure;
     
-    public Func<RinhaClosureParams, RinhaObject>? Value { get; set; }
+    public RinhaRunnableClosure Inner { get; set; }
     public int ParamsCount { get; set; }
 
-    public RinhaClosure(int paramsCount)
+    public RinhaClosure(RinhaRunnableClosure inner, int paramsCount)
     {
+        Inner = inner;
         ParamsCount = paramsCount;
     }
 

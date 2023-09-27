@@ -8,6 +8,7 @@ public enum KnownType
     SystemObject,
     RinhaObject,
     RinhaObjectArr,
+    RinhaInnerClosure,
 
     SystemVoid,
     SystemConsole,
@@ -34,6 +35,7 @@ public class KnownTypes
             { KnownType.SystemObject, module.ImportReference(typeof(object)) },
             { KnownType.RinhaObject, module.ImportReference(typeof(RinhaObject)) },
             { KnownType.RinhaObjectArr, module.ImportReference(typeof(RinhaObject[])) },
+            { KnownType.RinhaInnerClosure, module.ImportReference(typeof(RinhaRunnableClosure)) },
 
             { KnownType.SystemVoid, module.ImportReference(typeof(void)) },
             { KnownType.SystemConsole, module.ImportReference(typeof(Console)) },

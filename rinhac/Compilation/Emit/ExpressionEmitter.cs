@@ -115,6 +115,8 @@ public partial class Emitter
     {
         var ctor = FindClosureCtor(lambda.Symbol);
         il.Emit(OpCodes.Newobj, ctor);
+        il.Emit(OpCodes.Ldc_I4, lambda.Parameters.Count);
+        EmitBuiltInCtor(il, KnownMethod.RinhaClosureCtor);
     }
 
     public void EmitLetIn(

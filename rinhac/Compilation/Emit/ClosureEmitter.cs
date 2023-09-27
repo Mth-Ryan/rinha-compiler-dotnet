@@ -12,7 +12,7 @@ public partial class Emitter
         var name = $"Closure_{function.GetHashCode().ToString("X")}";
         return EmitClass(name,
             TypeAttributes.Sealed,
-            _knownTypes.GetRef(KnownType.SystemObject));
+            _knownTypes.GetRef(KnownType.RinhaInnerClosure));
     }
 
     private void EmitClosureCtor(TypeDefinition closureClass)
@@ -27,6 +27,9 @@ public partial class Emitter
             _knownTypes.GetRef(KnownType.SystemVoid));
 
         var il = method.Body.GetILProcessor();
+
+        il.Emit(OpCodes.Ldarg_0);
+        il.Emit(OpCodes.Call, _knownMethods.GetRef(KnownMethod.RinhaInnerClosureCtor));
         il.Emit(OpCodes.Ret);
     }
 
@@ -35,7 +38,9 @@ public partial class Emitter
         var method = EmitMethod(
             closureClass,
             "Run",
-            MethodAttributes.Public,
+            MethodAttributes.Public |
+            MethodAttributes.Virtual |
+            MethodAttributes.HideBySig,
             _knownTypes.GetRef(KnownType.RinhaObject));
 
         var args = new ParameterDefinition(

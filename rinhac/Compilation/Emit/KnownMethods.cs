@@ -11,6 +11,8 @@ public enum KnownMethod
     RinhaBoolCtor,
     RinhaStrCtor,
     RinhaTupleCtor,
+    RinhaInnerClosureCtor,
+    RinhaClosureCtor,
 
     // Arithmetic
     RinhaAdd,
@@ -71,6 +73,18 @@ public class KnownMethods
                 KnownMethod.RinhaTupleCtor,
                 module.ImportReference(
                     typeof(RinhaTuple).GetConstructors()[0]
+                )
+            },
+            {
+                KnownMethod.RinhaInnerClosureCtor,
+                module.ImportReference(
+                    typeof(RinhaRunnableClosure).GetConstructors()[0]
+                )
+            },
+            {
+                KnownMethod.RinhaClosureCtor,
+                module.ImportReference(
+                    typeof(RinhaClosure).GetConstructors()[0]
                 )
             },
             {
