@@ -2,6 +2,7 @@ using System.Collections.Immutable;
 using Rinha.Diagnostics;
 using Mono.Cecil;
 using Rinha.Semantic;
+using System.Reflection;
 
 namespace Rinha.Compilation.Emit;
 
@@ -38,10 +39,12 @@ public partial class Emitter
         _assembly.EntryPoint = mainMethodRef;
         var targetDir = CreateEmitDirectory(_moduleName, outputDir);
         _assembly.Write(Path.Combine(targetDir, $"{_moduleName}.dll"));
+        EmitCoreLib(targetDir);
         EmitRuntimeConfig(_moduleName, targetDir);
 
         return new ImmutableArray<Diagnostic>();
     }
+
 
     private string CreateEmitDirectory(string filename, string baseDir)
     {
@@ -51,6 +54,19 @@ public partial class Emitter
             Directory.CreateDirectory(targetSpecificDir);
 
         return targetSpecificDir;
+    }
+
+    private void EmitCoreLib(string targetDir)
+    {
+        var selfTargetDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        var sourceCore = Path.Combine(selfTargetDir!, "Rinha.Core.dll");
+        var targetFile = Path.Combine(targetDir, "Rinha.Core.dll");
+        
+        if (File.Exists(targetFile))
+        {
+            File.Delete(targetFile);
+        }
+        File.Copy(sourceCore, targetFile);
     }
 
     private void EmitRuntimeConfig(string filename, string targetDir)
