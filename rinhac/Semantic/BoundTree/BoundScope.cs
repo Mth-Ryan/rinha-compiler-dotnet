@@ -26,6 +26,13 @@ public class VariableSymbol
     }
 }
 
+public class FunctionSymbol
+{
+    public FunctionSymbol()
+    {
+    }
+}
+
 public class VariableLookUpResponse
 {
     public VariableSymbol Variable { get; set; }

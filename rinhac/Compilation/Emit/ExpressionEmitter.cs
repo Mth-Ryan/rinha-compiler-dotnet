@@ -1,4 +1,5 @@
 using Mono.Cecil.Cil;
+using Mono.Cecil;
 using Rinha.Semantic.BoundTree;
 using Rinha.Syntax;
 
@@ -107,6 +108,15 @@ public partial class Emitter
         il.Append(endLabel);
     }
 
+    public void EmitLambda(
+        ILProcessor il,
+        Dictionary<VariableSymbol, VariableDefinition>? locals,
+        LambdaExpr lambda)
+    {
+        var ctor = FindClosureCtor(lambda.Symbol);
+        il.Emit(OpCodes.Newobj, ctor);
+    }
+
     public void EmitLetIn(
         ILProcessor il,
         Dictionary<VariableSymbol, VariableDefinition>? locals,
@@ -177,6 +187,10 @@ public partial class Emitter
 
             case BoundKind.Var:
                 EmitVar(il, locals, (VarExpr)node);
+                break;
+
+            case BoundKind.Lambda:
+                EmitLambda(il, locals, (LambdaExpr)node);
                 break;
 
             default:

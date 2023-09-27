@@ -9,17 +9,19 @@ public class Binder
 {
     private readonly DiagnosticsBag _diagnostics;
     private readonly BoundScope _globalScope;
+    private readonly List<LambdaExpr> _functions;
 
     public Binder()
     {
         _diagnostics = new DiagnosticsBag();
         _globalScope = new BoundScope(null, ScopeKind.Closure);
+        _functions = new List<LambdaExpr>();
     }
 
     public (BoundProgram?, ImmutableArray<Diagnostic>) Bind(AstFile ast)
     {
         var expr = BindExpr(ast.Expression, _globalScope);
-        var program = new BoundProgram(expr, _globalScope);
+        var program = new BoundProgram(expr, _globalScope, _functions.ToImmutableArray());
 
         return (program, _diagnostics.ToImmutableArray());
     }
@@ -70,20 +72,28 @@ public class Binder
 
     private LambdaExpr BindLambda(FunctionTerm node, BoundScope? scope)
     {
+        var newFunction = new FunctionSymbol();
+        var parametersSymbols = new List<VariableSymbol>();
+
         var newScope = new BoundScope(scope, ScopeKind.Closure);
         foreach (var param in node.Parameters)
         {
-            newScope.TryDeclare(new VariableSymbol(
-                param.Text,
-                VariableSymbolKind.Argument));
+            var arg = new VariableSymbol(param.Text, VariableSymbolKind.Argument);
+            newScope.TryDeclare(arg);
+            parametersSymbols.Add(arg);
         }
 
-        return new LambdaExpr
+        var expr = new LambdaExpr
         {
             Scope = newScope,
+            Symbol = newFunction,
             Parameters = node.Parameters.Select(x => x.Text).ToList(),
+            ParametersSymbols = parametersSymbols,
             Body = BindExpr(node.Value, newScope)
         };
+
+        _functions.Add(expr);
+        return expr;
     }
 
     private IfExpr BindIf(IfTerm node, BoundScope? scope) =>
