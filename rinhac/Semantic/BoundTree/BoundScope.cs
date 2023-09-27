@@ -94,6 +94,9 @@ public class BoundScope
             VariableSymbolAccess.Outter);
     }
 
+    public ImmutableArray<VariableSymbol> GetVariables() =>
+        _variables.Values.ToImmutableArray();
+
     public ImmutableArray<VariableSymbol> GetAllBlockVariables()
     {
         var variables = _variables.Values

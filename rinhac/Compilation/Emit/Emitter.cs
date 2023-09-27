@@ -1,8 +1,7 @@
 using System.Collections.Immutable;
 using Rinha.Diagnostics;
 using Mono.Cecil;
-using Mono.Cecil.Cil;
-using Rinha.Semantic.BoundTree;
+using Rinha.Semantic;
 
 namespace Rinha.Compilation.Emit;
 
@@ -28,33 +27,16 @@ public partial class Emitter
         _knownMethods = new KnownMethods(_module);
     }
 
-    public ImmutableArray<Diagnostic> EmitFile(Node boundTree, string outputDir)
+    public ImmutableArray<Diagnostic> EmitFile(BoundProgram program, string outputDir)
     {
 
         var mainClassRef = EmitProgramClass();
-        var mainMethodRef = EmitMainMethod(_module, mainClassRef);
+        var mainMethodRef = EmitMainMethod(mainClassRef);
 
-        var ilProcessor = mainMethodRef.Body.GetILProcessor();
+        EmitMethodBody(mainMethodRef, program.BoundTree, program.GlobalScope, true);
 
         _assembly.EntryPoint = mainMethodRef;
-
         var targetDir = CreateEmitDirectory(_moduleName, outputDir);
-
-        EmitExpression(
-            ilProcessor,
-            new PrintExpr
-            {
-                Value = new IfExpr
-                {
-                    Condition = new BooleanExpr { Value = false },
-                    Then = new IntegerExpr { Value = 1 },
-                    Else = new IntegerExpr { Value = 3 }
-                }
-            });
-
-        ilProcessor.Emit(OpCodes.Pop);
-        ilProcessor.Emit(OpCodes.Ret);
-
         _assembly.Write(Path.Combine(targetDir, $"{_moduleName}.dll"));
         EmitRuntimeConfig(_moduleName, targetDir);
 

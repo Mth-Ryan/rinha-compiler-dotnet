@@ -1,4 +1,6 @@
 using Mono.Cecil;
+using Mono.Cecil.Cil;
+using Rinha.Semantic.BoundTree;
 
 namespace Rinha.Compilation.Emit;
 
@@ -16,12 +18,36 @@ public partial class Emitter
         return methodRef;
     }
 
-    private MethodDefinition EmitMainMethod(ModuleDefinition module, TypeDefinition mainClass)
+    private MethodDefinition EmitMainMethod(TypeDefinition mainClass)
     {
         return EmitMethod(
             mainClass,
             "Main",
             MethodAttributes.Static | MethodAttributes.Private,
             _knownTypes.GetRef(KnownType.SystemVoid));
+    }
+
+    private void EmitMethodBody(
+        MethodDefinition method,
+        Expression boundExpression,
+        BoundScope scope,
+        bool voidFunc = false)
+    {
+        var varSymbols = scope.GetAllBlockVariables();
+        var locals = varSymbols.ToDictionary(
+            s => s,
+            s => new VariableDefinition(_knownTypes.GetRef(KnownType.RinhaObject)));
+
+        foreach (var def in locals.Values)
+        {
+            method.Body.Variables.Add(def);
+        }
+
+        var il = method.Body.GetILProcessor();
+        EmitExpression(il, boundExpression);
+
+        if (voidFunc)
+            il.Emit(OpCodes.Pop);
+        il.Emit(OpCodes.Ret);
     }
 }

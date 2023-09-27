@@ -16,10 +16,12 @@ public class Binder
         _globalScope = new BoundScope(null, ScopeKind.Closure);
     }
 
-    public (Expression?, ImmutableArray<Diagnostic>) Bind(AstFile ast)
+    public (BoundProgram?, ImmutableArray<Diagnostic>) Bind(AstFile ast)
     {
         var expr = BindExpr(ast.Expression, _globalScope);
-        return (expr, _diagnostics.ToImmutableArray());
+        var program = new BoundProgram(expr, _globalScope);
+
+        return (program, _diagnostics.ToImmutableArray());
     }
 
     private IntegerExpr BindInteger(IntTerm node) =>
