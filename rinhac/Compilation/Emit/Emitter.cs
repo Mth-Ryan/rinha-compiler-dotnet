@@ -15,6 +15,7 @@ public partial class Emitter
     private KnownTypes _knownTypes;
     private KnownMethods _knownMethods;
     private Dictionary<FunctionSymbol, TypeDefinition> _closures;
+    private Dictionary<VariableSymbol, LambdaExpr> _functions;
 
     public Emitter(string filename)
     {
@@ -29,6 +30,7 @@ public partial class Emitter
         _knownTypes = new KnownTypes(_module);
         _knownMethods = new KnownMethods(_module);
         _closures = new Dictionary<FunctionSymbol, TypeDefinition>();
+        _functions = new Dictionary<VariableSymbol, LambdaExpr>();
     }
 
     public ImmutableArray<Diagnostic> EmitFile(BoundProgram program, string outputDir)

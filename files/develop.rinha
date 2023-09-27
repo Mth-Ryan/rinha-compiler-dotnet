@@ -1,4 +1,5 @@
-let fib = fn (n) => {
-    n
+let k = 1;
+let sum = fn (x) => {
+    x + k
 };
-print(fib(2))
+print(sum(5))

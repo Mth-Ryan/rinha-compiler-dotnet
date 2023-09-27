@@ -88,10 +88,15 @@ public partial class Emitter
         var closureClass = EmitClosureClass(function.Symbol);
         EmitClosureCtor(closureClass);
         var (method, param) = EmitClosureMethod(closureClass);
+
+        var paramsSymbols = function.ParametersSymbols;
+        if (function.Scope is not null)
+            paramsSymbols.AddRange(function.Scope.GetOutsideDependencies());
+
         EmitClosureBody(
             method,
             param,
-            function.ParametersSymbols,
+            paramsSymbols,
             function.Body,
             function.Scope!);
 

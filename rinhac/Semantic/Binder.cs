@@ -10,12 +10,14 @@ public class Binder
     private readonly DiagnosticsBag _diagnostics;
     private readonly BoundScope _globalScope;
     private readonly List<LambdaExpr> _functions;
+    private readonly Dictionary<VariableSymbol, LambdaExpr> _namedFunctions;
 
     public Binder()
     {
         _diagnostics = new DiagnosticsBag();
         _globalScope = new BoundScope(null, ScopeKind.Closure);
         _functions = new List<LambdaExpr>();
+        _namedFunctions = new Dictionary<VariableSymbol, LambdaExpr>();
     }
 
     public (BoundProgram?, ImmutableArray<Diagnostic>) Bind(AstFile ast)
@@ -138,6 +140,7 @@ public class Binder
 
         if (scope is not null)
         {
+            scope.TryUse(node.Text);
             var symbolResponse = scope.TryLookUp(node.Text);
             if (symbolResponse is not null)
             {

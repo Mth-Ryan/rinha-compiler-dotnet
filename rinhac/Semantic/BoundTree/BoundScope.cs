@@ -54,6 +54,7 @@ public enum ScopeKind
 public class BoundScope
 {
     private Dictionary<string, VariableSymbol> _variables;
+    private List<VariableSymbol> _used;
 
     internal BoundScope? Parent { get; init; }
     internal List<BoundScope> Children { get; set; }
@@ -72,6 +73,7 @@ public class BoundScope
         }
 
         _variables = new Dictionary<string, VariableSymbol>();
+        _used = new List<VariableSymbol>();
     }
 
     public bool TryDeclare(VariableSymbol variable)
@@ -82,6 +84,19 @@ public class BoundScope
         _variables.Add(variable.Name, variable);
         return true;
     }
+
+    public bool TryUse(string name)
+    {
+        var response = TryLookUp(name);
+        if (response is not null)
+        {
+            if (!_used.Contains(response.Variable))
+                _used.Add(response.Variable);
+            return true;
+        }
+        return false;
+    }
+
 
     public VariableLookUpResponse? TryLookUp(string name)
     {
@@ -123,6 +138,28 @@ public class BoundScope
         _variables.Values
             .Where(x => x.Kind == VariableSymbolKind.Argument)
             .ToImmutableArray();
+
+    public ImmutableArray<VariableSymbol> GetAllUsed()
+    {
+        var used = _used.ToList();
+
+        var blockChildren = Children.Where(c => c.Kind == ScopeKind.Block);
+        foreach (var child in blockChildren)
+        {
+            used.AddRange(child.GetAllUsed());
+        }
+
+        return used.ToImmutableArray();
+    }
+
+    public ImmutableArray<VariableSymbol> GetOutsideDependencies()
+    {
+        var all = new [] { GetAllArguments(), GetAllBlockVariables() };
+        var inner = all.SelectMany(x => x).ToList();
+        var used = GetAllUsed();
+
+        return used.Except(inner).ToImmutableArray();
+    }
 }
 
 

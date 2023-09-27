@@ -2,6 +2,7 @@ using Mono.Cecil.Cil;
 using Mono.Cecil;
 using Rinha.Semantic.BoundTree;
 using Rinha.Syntax;
+using System.Collections.Immutable;
 
 namespace Rinha.Compilation.Emit;
 
@@ -123,9 +124,11 @@ public partial class Emitter
         Params? args,
         LambdaExpr lambda)
     {
+        var dependencies = lambda.Scope!.GetOutsideDependencies();
+
         var ctor = FindClosureCtor(lambda.Symbol);
         il.Emit(OpCodes.Newobj, ctor);
-        il.Emit(OpCodes.Ldc_I4, lambda.Parameters.Count);
+        il.Emit(OpCodes.Ldc_I4, lambda.Parameters.Count + dependencies.Length);
         EmitBuiltInCtor(il, KnownMethod.RinhaClosureCtor);
     }
 
@@ -139,14 +142,39 @@ public partial class Emitter
         EmitExpression(il, locals, args, node.Callee);
 
         // args
+        LambdaExpr? func = null;
+        var dependencies = new ImmutableArray<VariableSymbol>();
+        if (node.Callee is LambdaExpr)
+        {
+            func = (LambdaExpr)node.Callee;
+        }
+        else if (node.Callee is VarExpr)
+        {
+            var variable = (VarExpr)node.Callee;
+            func = _functions[variable.Symbol!];
+        }
+
+        if (func is not null)
+        {
+            dependencies = func.Scope!.GetOutsideDependencies();
+        }
+
         var argsCount = node.Arguments.Count;
-        il.Emit(OpCodes.Ldc_I4, argsCount);
+        il.Emit(OpCodes.Ldc_I4, argsCount + dependencies.Length);
         il.Emit(OpCodes.Newarr, _knownTypes.GetRef(KnownType.RinhaObject));
         for (var i = 0; i < argsCount; i++)
         {
             il.Emit(OpCodes.Dup);
             il.Emit(OpCodes.Ldc_I4, i);
             EmitExpression(il, locals, args, node.Arguments[i]);
+            il.Emit(OpCodes.Stelem_Ref);
+        }
+
+        for (var i = argsCount; i < argsCount + dependencies.Length; i++)
+        {
+            il.Emit(OpCodes.Dup);
+            il.Emit(OpCodes.Ldc_I4, i);
+            FindAndEmitVar(il, dependencies[i - argsCount], locals, args);
             il.Emit(OpCodes.Stelem_Ref);
         }
 
@@ -159,6 +187,10 @@ public partial class Emitter
         Params? args,
         LetInExpr node)
     {
+        if (node.Value is LambdaExpr)
+        {
+            _functions[node.NewVariable] = (LambdaExpr)node.Value;
+        }
         EmitExpression(il, locals, args, node.Value);
         var variable = locals![node.NewVariable];
         il.Emit(OpCodes.Stloc, variable);
