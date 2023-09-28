@@ -2,7 +2,7 @@
 
 set -e
 
-./rinha-compiler-dotnet "$1" -o targets
+./rinhac "/var/rinha/source.rinha.json" -o targets
 
-TARGET=$(basename "$1" ".json")
+TARGET="source.rinha"
 dotnet ./targets/$TARGET/"$TARGET.dll"
