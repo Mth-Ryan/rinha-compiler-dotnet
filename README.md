@@ -1,8 +1,8 @@
 # rinha-compiler-dotnet
 Um compilador .Net simples para a Rinha de Compiler.  Isso foi feito em menos de 5 dias (praticamente), não espere muito. Foi apenas uma aventura divertida.
 
-Este compilador compila um arquivo AST em json da [Rinha de compiler](https://github.com/aripiprazole/rinha-de-compiler/tree/main) para uma dll .Net que
-pode ser utilizada por virtualmente qualquer .Net runtime 5+.
+Este projeto compila um arquivo AST em json da [Rinha de compiler](https://github.com/aripiprazole/rinha-de-compiler/tree/main) para uma dll .Net que
+pode ser utilizada por virtualmente qualquer runtime .Net 5+.
 
 ## Como rodar
 
