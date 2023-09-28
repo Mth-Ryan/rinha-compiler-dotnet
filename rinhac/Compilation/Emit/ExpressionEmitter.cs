@@ -124,6 +124,7 @@ public partial class Emitter
         Params? args,
         LambdaExpr lambda)
     {
+        EmitClosureBody(lambda.Symbol, lambda);
         var dependencies = lambda.Scope!.GetOutsideDependencies();
 
         var ctor = FindClosureCtor(lambda.Symbol);

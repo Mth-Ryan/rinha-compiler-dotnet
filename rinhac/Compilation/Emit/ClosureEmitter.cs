@@ -103,11 +103,41 @@ public partial class Emitter
         return closureClass;
     }
 
+    private TypeDefinition EmitClosureDefinition(LambdaExpr function)
+    {
+        var closureClass = EmitClosureClass(function.Symbol);
+        EmitClosureCtor(closureClass);
+        EmitClosureMethod(closureClass);
+
+        return closureClass;
+    }
+
+    private TypeDefinition EmitClosureBody(FunctionSymbol symbol, LambdaExpr function)
+    {
+        var closure = _closures[symbol];
+
+        var method = closure.Methods.FirstOrDefault(m => m.Name == "Run");
+        var param = method!.Parameters.FirstOrDefault();
+
+        var paramsSymbols = function.ParametersSymbols;
+        if (function.Scope is not null)
+            paramsSymbols.AddRange(function.Scope.GetOutsideDependencies());
+
+        EmitClosureBody(
+            method,
+            param!,
+            paramsSymbols,
+            function.Body,
+            function.Scope!);
+
+        return closure;
+    }
+
     private Dictionary<FunctionSymbol, TypeDefinition> EmitAllClosuresDefinitions(BoundProgram program)
     {
         var table = program.Functions.ToDictionary(
             f => f.Symbol,
-            f => EmitClosure(f)
+            f => EmitClosureDefinition(f)
         );
 
         return table;

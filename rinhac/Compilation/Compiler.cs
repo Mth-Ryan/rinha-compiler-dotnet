@@ -3,7 +3,6 @@ using System.Text.Json;
 using Rinha.Diagnostics;
 using Rinha.Internal.AstJson;
 using Rinha.Semantic;
-using Rinha.Semantic.BoundTree;
 using Rinha.Syntax;
 
 namespace Rinha.Compilation;
@@ -74,10 +73,6 @@ public static class Compiler
     {
         var binder = new Binder();
         var (bound, diagnostics) = binder.Bind(ast);
-
-        PrettyPrinter.Print(bound!.BoundTree);
-        Console.WriteLine("");
-        PrettyPrinter.Print(bound!.GlobalScope);
 
         var emiter = new Emit.Emitter(filename);
         emiter.EmitFile(bound!, outputPath);
